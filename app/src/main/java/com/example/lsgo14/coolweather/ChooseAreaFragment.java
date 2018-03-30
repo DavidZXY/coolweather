@@ -75,7 +75,7 @@ public class ChooseAreaFragment extends Fragment {
         mTitleText = view.findViewById(R.id.title_text);
         mBackButton = view.findViewById(R.id.back_button);
         mListView = view.findViewById(R.id.list_view);
-        mAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, dataList);
+        mAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList);
         mListView.setAdapter(mAdapter);
         return view;
     }
@@ -120,6 +120,7 @@ public class ChooseAreaFragment extends Fragment {
                 }
             }
         });
+        queryProvinces();
     }
 
     /**
@@ -153,7 +154,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCities() {
         mTitleText.setText(mSelectedProvince.getProvinceName());
         mBackButton.setVisibility(View.VISIBLE);
-        mCityList = DataSupport.where("province = ?", String.valueOf(mSelectedProvince.getId())).find(City.class);
+        mCityList = DataSupport.where("mProvinceid = ?", String.valueOf(mSelectedProvince.getId())).find(City.class);
         if (mCityList.size() > 0) {
             dataList.clear();
             for (City city : mCityList) {
@@ -164,7 +165,7 @@ public class ChooseAreaFragment extends Fragment {
             mCurrentLevel = LEVEL_CITY;
         } else {
             int provinceCode = mSelectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china" + provinceCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode;
             queryFromServer(address, "city");
         }
     }
@@ -177,7 +178,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCounties() {
         mTitleText.setText(mSelectedCity.getCityName());
         mBackButton.setVisibility(View.VISIBLE);
-        mCountyList = DataSupport.where("cityid = ?", String.valueOf(mSelectedCity.getId())).find(County.class);
+        mCountyList = DataSupport.where("mCityid = ?", String.valueOf(mSelectedCity.getId())).find(County.class);
         if (mCountyList.size() > 0) {
             dataList.clear();
             for (County county : mCountyList) {
@@ -246,7 +247,7 @@ public class ChooseAreaFragment extends Fragment {
     }
 
     private void showProgressDialog() {
-        if (mProgressDialog != null) {
+        if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(getActivity());
             mProgressDialog.setMessage("正在加载");
             mProgressDialog.setCanceledOnTouchOutside(false);
